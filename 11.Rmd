@@ -37,6 +37,8 @@ library(vembedr)
 
 # What is survival (censored) data?
 
+![Source: https://www.reddit.com/r/statisticsmemes/comments/u21swt/what_i_learned_in_survival_analysis_so_far/](img/survival_analysis_meme.jpg)
+
 Time-to-event data that consist of a distinct start time and end time
 
 Examples:
@@ -159,6 +161,41 @@ logrank.test
 ```
 
 The resulting $p$-value is $0.23$, indicating  no evidence of a difference in survival between the two sexes.
+
+# Hazard Function
+
+The hazard function (11.9) is defined at a given moment *t* in time, the potential risk of having an event given you survived up to time *t*.
+
+![Source: https://tinyheero.github.io/2016/05/12/survival-analysis.html](img/hazard_function.png)
+
+It’s important to note here that the hazard is **not a probability** because we are dividing the probability by a time interval. Instead what we get is a rate. And since we are dealing with the condition of survival up to time t, this is why sometimes the hazard function is referred to as conditional failure rate.
+
+Why do we care about the hazard function? It turns out that a key approach for modeling survival data as a function of covariates (i.e., regressors) relies heavily on the hazard function.
+
+# Cumulative Hazard Function
+
+![Source: https://tinyheero.github.io/2016/05/12/survival-analysis.html](img/cum_hazard_function.png)
+
+Let's plot the cumulative hazard for the Brain cancer dataset with sex as covariate
+```{r cum_hazard_plot}
+ggsurvplot(fit.sex, 
+           data = BrainCancer, 
+           conf.int = TRUE, 
+           risk.table.col = "strata", 
+           legend.title = "Sex", 
+           legend.labs = c("Female", "Male"), 
+           fun = "cumhaz")
+```
+
+# Proportional Hazards
+
+The *proportional hazards assumption* states that
+
+![Source: ISLR2 (11.14)](img/prop_hazard.png)
+
+It is important to emphasize that the relative risk does not depend on time, i.e. it is constant in time for the same pair of values of any feature, so hazards are proportional independent of time.
+
+We can use some specific distribution for the baseline survival or hazard function – and then we get a **parametric PH model**, or do not make such assumptions about the baseline functions – and then get a **semi-parametric PH model**, often called a Cox PH model after its author.
 
 # Regression Models
 

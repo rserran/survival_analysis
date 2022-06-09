@@ -17,11 +17,11 @@ BrainCancer
 # Fit proportional hazards model using cubic M-splines (similar
 # but not identical to the Cox model!):
 mod_sex <- stan_surv(Surv(time, status) ~ sex, data = BrainCancer)
-mod_sex
+summary(mod_sex)
 
 # fit PH model adding stereo features
 mod_stereo <- stan_surv(Surv(time, status) ~ sex + stereo, data = BrainCancer)
-mod_stereo
+summary(mod_stereo)
 
 # extract posterior draws
 posterior <- as.array(mod_stereo)
@@ -36,7 +36,6 @@ mcmc_areas(
      posterior, 
      pars = vars(sexMale, stereoSRT), 
      prob = 0.8, # 80% intervals
-     prob_outer = 0.99, # 99%
+     prob_outer = 0.95, # 95%
      point_est = "mean"
 )
-
