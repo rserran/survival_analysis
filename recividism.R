@@ -13,7 +13,7 @@ unique(Rossi$week)
 
 # Cox PH regression model
 mod.allison <- coxph(Surv(week, arrest) ~ fin + age + race + wexp + 
-                          mar + paro + prio, 
+                          mar + paro + prio + educ, 
                      data = Rossi)
 
 mod.allison
@@ -36,6 +36,9 @@ ggforest(mod.allison)
 ggcoxdiagnostics(mod.allison, type = 'deviance')
 
 ggcoxdiagnostics(mod.allison, type = 'martingale')
+
+# save Rossi subset to csv file
+write.csv(Rossi[, 1:10], './rossi_select_df.csv')
 
 # heart failure dataset
 data("heart")

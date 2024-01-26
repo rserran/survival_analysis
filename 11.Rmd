@@ -153,6 +153,23 @@ ggsurvplot(fit.sex, data = BrainCancer,
            legend.labs = c("Female", "Male"))
 ```
 
+# `ggsurvfit` package
+
+Using `ggsurvfit` plot
+```{r ggsurvit}
+library(ggsurvfit)
+
+survfit2(Surv(time, status) ~ sex, data = BrainCancer) %>% 
+     ggsurvfit(linewidth =1) + 
+     add_risktable() + 
+     add_confidence_interval() + 
+     add_pvalue() + 
+     scale_ggsurvfit() + 
+     labs(y = 'Recurrence-free Progression', 
+          title = 'Brain Cancer KM Estimator Plot') + 
+     ggeasy::easy_move_legend('top')
+```
+
 As discussed in Section 11.4, we can perform a log-rank test to compare the survival of males to females, using the `survdiff()` function.
 
 ```{r logrank_test}
