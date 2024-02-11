@@ -46,6 +46,61 @@ ax.set(
 )
 
 # b.
+from scipy.stats import bootstrap
+
+# define variables
+time_column = 'time'
+event_column = 'status'
+
+# Set the number of bootstrap samples and size of each sample
+B = 200
+n_bootstrap = 88
+
+# Function to compute Kaplan-Meier survival curve for a given bootstrap sample
+def compute_kaplan_meier(data):
+    kmf.fit(durations=data[time_column], event_observed=data[event_column], alpha = 0.33)
+    return kmf.survival_function_
+
+compute_kaplan_meier(bc_df)
+
+km_df = compute_kaplan_meier(bc_df).reset_index()
+
+# Perform bootstrap sampling and calculate confidence intervals
+bootstrap_dict = {}
+
+for i in range(B):
+    # Generate a bootstrap sample by sampling with replacement
+    bootstrap_sample = np.random.choice(km_df['KM_estimate'], size=len(bc_df), replace=True)
+    bootstrap_sample[::-1].sort()
+
+    # Apply the function to the bootstrap sample
+    array_name = f'Column{i}'
+    bootstrap_dict[array_name] = bootstrap_sample
+
+bootstrap_df = pd.DataFrame(bootstrap_dict)
+
+# calculate standard deviation for each row
+bootstrap_mean = bootstrap_df.mean(axis=1, numeric_only=True)
+bootstrap_std = bootstrap_df.std(axis=1, numeric_only=True)
+
+bs_df = pd.concat([km_df['timeline'], bootstrap_mean, bootstrap_std], axis=1) \
+    .set_axis(['time', 'bs_mean', 'bs_std'], axis=1) \
+    .dropna() \
+    .assign(bs_plus_one_se = lambda x: x['bs_mean'] + x['bs_std']) \
+    .assign(bs_minus_one_se = lambda x: x['bs_mean'] - x['bs_std'])
+
+bs_df
+
+# convert kmf.survival_function_.values to pandas Series
+my_list = map(lambda x: x[0], kmf.survival_function_.values)
+kmf_values_series = pd.Series(my_list)
+
+# Plot the Kaplan-Meier survival curve with ±1 standard error bands
+plt.plot(kmf.timeline, kmf.survival_function_.values, label='Original', color='blue')
+plt.fill_between(bs_df['time'], kmf_values_series - bs_df['bs_std'], 
+                 kmf_values_series + bs_df['bs_std'], 
+                 alpha=0.2, color='blue')
+
 
 # c.
 # Fit a Cox proportional hazards model that uses all of the predictors to 
