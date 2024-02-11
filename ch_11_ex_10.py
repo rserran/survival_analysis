@@ -46,7 +46,6 @@ ax.set(
 )
 
 # b.
-from scipy.stats import bootstrap
 
 # define variables
 time_column = 'time'
@@ -61,16 +60,16 @@ def compute_kaplan_meier(data):
     kmf.fit(durations=data[time_column], event_observed=data[event_column], alpha = 0.33)
     return kmf.survival_function_
 
-compute_kaplan_meier(bc_df)
-
 km_df = compute_kaplan_meier(bc_df).reset_index()
+
+# np.random.choice(compute_kaplan_meier(bc_df), size=n_bootstrap, replace=True)
 
 # Perform bootstrap sampling and calculate confidence intervals
 bootstrap_dict = {}
 
 for i in range(B):
     # Generate a bootstrap sample by sampling with replacement
-    bootstrap_sample = np.random.choice(km_df['KM_estimate'], size=len(bc_df), replace=True)
+    bootstrap_sample = np.random.choice(km_df['KM_estimate'], size=n_bootstrap, replace=True)
     bootstrap_sample[::-1].sort()
 
     # Apply the function to the bootstrap sample
